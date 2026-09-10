@@ -1161,7 +1161,7 @@ Verification: `git --version && docker --version && docker compose version && no
 **First project run (target: under 15 minutes on a fresh machine)**
 
 ```bash
-git clone https://github.com/EngineerMehran/VisionCare-AI && cd VisionCare-AI
+git clone https://github.com/Abdur-Rehman-ds/VisionCare-AI && cd VisionCare-AI
 cp .env.example .env                 # defaults work for local
 docker compose up --build            # db → model → api (runs alembic upgrade head) → frontend
 docker compose exec api python -m app.demo.seed   # seed the demo clinic

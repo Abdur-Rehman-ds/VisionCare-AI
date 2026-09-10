@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: visioncare
+      POSTGRES_USER: vc
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vc -d visioncare"]
+      interval: 5s
+      retries: 10
+
+  model:
+    build: ../model-service
+    environment:
+      MODEL_VERSION: ${MODEL_VERSION}
+
+  api:
+    build: ../backend
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      MODEL_SERVICE_URL: http://model:8001
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      db: { condition: service_healthy }
+      model: { condition: service_started }
+    ports: ["8000:8000"]
+
+  frontend:
+    build: ../frontend
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:8000/api/v1"
+    depends_on: [api]
+    ports: ["3000:3000"]
+
+volumes: { pgdata: }

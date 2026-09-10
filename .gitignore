@@ -1,0 +1,27 @@
+# --- never in git (§14A) ---
+*.pth
+*.onnx
+*.ckpt
+data/
+ai-model/data/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.mypy_cache/
+
+# node / next
+node_modules/
+.next/
+out/
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# misc
+.DS_Store
+*.log

@@ -1,0 +1,47 @@
+{
+  "experiment_context": "pre-EXP-1 data QA gate",
+  "date": "2026-09-11",
+  "images_total": 3662,
+  "corrupt": 0,
+  "class_distribution": {
+    "0": 1805,
+    "1": 370,
+    "2": 999,
+    "3": 193,
+    "4": 295
+  },
+  "duplicate_pairs": 2551,
+  "oversized_chained_clusters": [
+    186,
+    170,
+    118,
+    89,
+    73,
+    71,
+    30,
+    16,
+    14,
+    14
+  ],
+  "split_groups_after_dechain": 3285,
+  "label_conflict_clusters": 88,
+  "conflicted_images_removed_from_val": 64,
+  "split_sizes": {
+    "train": 2925,
+    "val": 673
+  },
+  "val_class_distribution": {
+    "0": 363,
+    "1": 70,
+    "2": 168,
+    "3": 34,
+    "4": 38
+  },
+  "notes": [
+    "APTOS provides no patient identifiers; pHash clustering used as split unit",
+    "pHash chaining produced 10 oversized clusters (max 186 imgs); broken at MAX_CLUSTER=10, conflicts recomputed",
+    "88 real label-conflicting duplicate clusters (inter-grader disagreement, visually confirmed) excluded from validation split, retained in train",
+    "val grade-3 (n=34) and grade-4 (n=38) recalls will be noisy in EXP-1; EXP-2 5-fold CV addresses this",
+    "gate passes only if: corrupt==0 and no cluster straddles splits (asserted in Cell 5)"
+  ]
+}

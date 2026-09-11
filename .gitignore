@@ -25,3 +25,8 @@ out/
 # misc
 .DS_Store
 *.log
+
+# exception: splits are reproducibility-critical (§14A) — always tracked
+!ai-model/data/
+ai-model/data/*
+!ai-model/data/splits.json

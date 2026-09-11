@@ -30,3 +30,4 @@ out/
 !ai-model/data/
 ai-model/data/*
 !ai-model/data/splits.json
+!ai-model/data/messidor2_pairs.csv

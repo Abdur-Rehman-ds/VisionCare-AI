@@ -8,6 +8,7 @@ import Shell from "@/components/Shell";
 import {
   AnalysisOut,
   ApiError,
+  apiFetchBlob,
   getAnalysis,
   GRADE_LABELS,
   requestAnalysis,
@@ -149,6 +150,10 @@ function AnalysisView() {
           )}
 
           {analysis.status === "completed" && (
+            <Heatmap analysisId={analysis.id} />
+          )}
+
+          {analysis.status === "completed" && (
             <div className="mt-6 border-t border-slate-200 pt-4">
               <Link
                 href={`/review/${analysis.id}`}
@@ -163,6 +168,43 @@ function AnalysisView() {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function Heatmap({ analysisId }: { analysisId: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let objectUrl: string | null = null;
+    apiFetchBlob(`/api/v1/analyses/${analysisId}/heatmap`)
+      .then((blob) => {
+        objectUrl = URL.createObjectURL(blob);
+        setUrl(objectUrl);
+      })
+      .catch(() => setUrl(null)); // no map -> section simply absent
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [analysisId]);
+
+  if (!url) return null;
+  return (
+    <div className="mt-6 border-t border-slate-200 pt-4">
+      <h2 className="text-sm font-bold text-slate-800">
+        Model attention map
+      </h2>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={url}
+        alt="Model attention overlay"
+        className="mt-2 w-72 rounded border border-slate-300"
+      />
+      <p className="mt-2 max-w-md text-xs text-slate-600">
+        Highlighted regions most influenced the AI suggestion
+        (Eigen-CAM). This is an algorithmic visualization, not a
+        clinical finding.
+      </p>
     </div>
   );
 }

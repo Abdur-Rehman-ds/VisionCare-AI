@@ -9,7 +9,8 @@ STD = np.array([0.229, 0.224, 0.225])
 PREPROC_VERSION = "preproc_v1"
 
 
-def preprocess(image_bytes: bytes) -> np.ndarray:
+def preprocess_with_image(image_bytes: bytes):
+    """Returns (normalized NCHW float32, 300px RGB uint8)."""
     arr = np.frombuffer(image_bytes, dtype=np.uint8)
     img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
     if img is None:
@@ -27,4 +28,9 @@ def preprocess(image_bytes: bytes) -> np.ndarray:
     out[t:t+h, l:l+w] = img
     img = cv2.resize(out, (IMG_SIZE, IMG_SIZE), interpolation=cv2.INTER_AREA)
     x = (img / 255.0 - MEAN) / STD
-    return x.transpose(2, 0, 1).astype(np.float32)[None]
+    return x.transpose(2, 0, 1).astype(np.float32)[None], img
+
+
+def preprocess(image_bytes: bytes) -> np.ndarray:
+    x, _ = preprocess_with_image(image_bytes)
+    return x

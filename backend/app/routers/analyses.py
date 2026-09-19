@@ -2,8 +2,10 @@
 row; frontend polls GET until completed/failed. Quality-failed images
 are refused analysis (FR-3.2: rejected scans never reach the model)."""
 import uuid
+from pathlib import Path
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -60,3 +62,15 @@ def get_analysis(analysis_id: uuid.UUID, db: Session = Depends(get_db),
     if a is None or a.clinic_id != user.clinic_id:
         raise HTTPException(404, "Analysis not found")
     return a
+
+
+@router.get("/analyses/{analysis_id}/heatmap")
+def get_heatmap(analysis_id: uuid.UUID, db: Session = Depends(get_db),
+                user: User = Depends(get_current_user)):
+    """Attention-map overlay (FR-4.5, Eigen-CAM per §21C amendment)."""
+    a = db.get(Analysis, analysis_id)
+    if a is None or a.clinic_id != user.clinic_id:
+        raise HTTPException(404, "Analysis not found")
+    if not a.gradcam_path or not Path(a.gradcam_path).exists():
+        raise HTTPException(404, "Attention map not available")
+    return FileResponse(a.gradcam_path, media_type="image/png")

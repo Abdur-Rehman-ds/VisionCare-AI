@@ -259,3 +259,12 @@ export function createReview(
 export function getReport(analysisId: string): Promise<ReportOut> {
   return apiFetch<ReportOut>(`/api/v1/analyses/${analysisId}/report`);
 }
+
+export async function apiFetchBlob(path: string): Promise<Blob> {
+  const headers = new Headers();
+  const token = getToken();
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+  const res = await fetch(`${API_BASE}${path}`, { headers });
+  if (!res.ok) throw new ApiError(res.status, res.statusText);
+  return res.blob();
+}

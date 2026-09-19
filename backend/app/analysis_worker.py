@@ -43,6 +43,20 @@ def run_analysis(analysis_id: uuid.UUID) -> None:
         # FR-4.4: uncertain → NO grade is stored; manual review required
         analysis.predicted_grade = None if result["is_uncertain"] \
             else result["predicted_grade"]
+        # FR-4.5 (§21C: Eigen-CAM): attention map is best-effort —
+        # its absence never fails the analysis
+        try:
+            hm = httpx.post(f"{settings.model_service_url}/heatmap",
+                            files={"file": ("image.png", data, "image/png")},
+                            timeout=60.0)
+            if hm.status_code == 200:
+                cam_path = Path(image.file_path).with_name(
+                    f"{image.id}_cam.png")
+                cam_path.write_bytes(hm.content)
+                analysis.gradcam_path = str(cam_path)
+        except Exception:
+            pass
+
         analysis.status = AnalysisStatus.completed
         analysis.completed_at = datetime.now(timezone.utc)
         db.add(AuditLog(clinic_id=analysis.clinic_id, user_id=None,

@@ -148,3 +148,37 @@ export function unarchivePatient(id: string): Promise<PatientOut> {
     method: "POST",
   });
 }
+
+/* ---------- images ---------- */
+
+export interface ImageOut {
+  id: string;
+  patient_id: string;
+  original_filename: string;
+  eye_side: string | null;
+  quality_status: string;
+  quality_reason: string | null;
+  created_at: string;
+}
+
+export function getPatient(id: string): Promise<PatientOut> {
+  return apiFetch<PatientOut>(`/api/v1/patients/${id}`);
+}
+
+export function listImages(patientId: string): Promise<ImageOut[]> {
+  return apiFetch<ImageOut[]>(`/api/v1/patients/${patientId}/images`);
+}
+
+export function uploadImage(
+  patientId: string,
+  file: File,
+  eyeSide: string,
+): Promise<ImageOut> {
+  const form = new FormData();
+  form.append("file", file);
+  form.append("eye_side", eyeSide);
+  return apiFetch<ImageOut>(`/api/v1/patients/${patientId}/images`, {
+    method: "POST",
+    body: form,
+  });
+}

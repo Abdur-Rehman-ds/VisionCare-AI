@@ -74,3 +74,24 @@ class ImageOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class AnalysisOut(BaseModel):
+    """FR-9: user-facing wording. The AI output is a SCREENING
+    SUGGESTION requiring doctor review — the field names and the
+    fixed suggestion_label enforce that framing at the API contract
+    level; no 'diagnosis' wording exists anywhere."""
+    id: uuid.UUID
+    image_id: uuid.UUID
+    status: str
+    suggestion_label: str = "AI Screening Suggestion — Doctor Review Required"
+    predicted_grade: int | None
+    is_uncertain: bool
+    severity_score: float | None
+    model_version: str | None
+    error_message: str | None
+    created_at: datetime
+    completed_at: datetime | None
+
+    class Config:
+        from_attributes = True

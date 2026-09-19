@@ -1,0 +1,32 @@
+[
+  {
+    "id_code": "000c1434d8d7",
+    "true_grade": 2,
+    "onnx_score": 1.776455,
+    "pred_grade": 2
+  },
+  {
+    "id_code": "001639a390f0",
+    "true_grade": 4,
+    "onnx_score": 4.081554,
+    "pred_grade": 4
+  },
+  {
+    "id_code": "0024cdab0c1e",
+    "true_grade": 1,
+    "onnx_score": 0.653236,
+    "pred_grade": 1
+  },
+  {
+    "id_code": "002c21358ce6",
+    "true_grade": 0,
+    "onnx_score": 0.081754,
+    "pred_grade": 0
+  },
+  {
+    "id_code": "0104b032c141",
+    "true_grade": 3,
+    "onnx_score": 2.454779,
+    "pred_grade": 2
+  }
+]

@@ -1,0 +1,33 @@
+{
+  "model_version": "dr-effb3-v1",
+  "date": "2026-09-19",
+  "task": "dr",
+  "architecture": "efficientnet_b3-ordinal-regression",
+  "preproc_version": "preproc_v1",
+  "img_size": 300,
+  "thresholds": [
+    0.5,
+    1.5,
+    2.5,
+    3.5
+  ],
+  "source": "EXP-002 fold0 (EyePACS pretrain -> APTOS 5-fold fine-tune)",
+  "internal": {
+    "cv_qwk": 0.9059,
+    "holdout_qwk": 0.9053,
+    "holdout_sens": 0.871,
+    "holdout_spec": 0.94
+  },
+  "external_messidor2": {
+    "qwk": 0.5661,
+    "sens": 0.311,
+    "spec": 0.989,
+    "auc": 0.8438,
+    "note": "calibration shift documented"
+  },
+  "artifacts": {
+    "onnx_sha256": "50eff7fc80249ca41ff89c06ee8726101c308571eee46d0e3c49df310e217e45",
+    "kaggle": "visioncare-model-export v1"
+  },
+  "tta": "hflip (eval-time; serving may disable for latency, \u00a715)"
+}

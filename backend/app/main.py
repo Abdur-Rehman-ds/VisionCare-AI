@@ -1,11 +1,10 @@
-"""VisionCare AI — Backend API skeleton (M1).
-
-Full module layout per §12.1 arrives in M3. M1 only proves the
-container topology: this service must respond on /health.
-"""
+"""VisionCare AI — Backend API (M3)."""
 from fastapi import FastAPI
 
-app = FastAPI(title="VisionCare AI API", version="0.0.1")
+from app.routers import auth
+
+app = FastAPI(title="VisionCare AI API", version="0.1.0")
+app.include_router(auth.router)
 
 
 @app.get("/health")

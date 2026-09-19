@@ -22,6 +22,7 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       MODEL_SERVICE_URL: http://model:8001
       JWT_SECRET: ${JWT_SECRET}
+    volumes: [uploads_data:/data/uploads]
     depends_on:
       db: { condition: service_healthy }
       model: { condition: service_started }
@@ -34,4 +35,4 @@ services:
     depends_on: [api]
     ports: ["3000:3000"]
 
-volumes: { pgdata: }
+volumes: { pgdata: , uploads_data: }

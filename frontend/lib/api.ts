@@ -182,3 +182,37 @@ export function uploadImage(
     body: form,
   });
 }
+
+/* ---------- analyses ---------- */
+
+export interface AnalysisOut {
+  id: string;
+  image_id: string;
+  status: string;
+  suggestion_label: string;
+  predicted_grade: number | null;
+  is_uncertain: boolean;
+  severity_score: number | null;
+  model_version: string | null;
+  error_message: string | null;
+  created_at: string;
+  completed_at: string | null;
+}
+
+export function requestAnalysis(imageId: string): Promise<AnalysisOut> {
+  return apiFetch<AnalysisOut>(`/api/v1/images/${imageId}/analyze`, {
+    method: "POST",
+  });
+}
+
+export function getAnalysis(id: string): Promise<AnalysisOut> {
+  return apiFetch<AnalysisOut>(`/api/v1/analyses/${id}`);
+}
+
+export const GRADE_LABELS: Record<number, string> = {
+  0: "No DR signs",
+  1: "Mild NPDR",
+  2: "Moderate NPDR",
+  3: "Severe NPDR",
+  4: "Proliferative DR",
+};

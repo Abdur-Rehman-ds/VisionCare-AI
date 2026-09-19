@@ -1,2 +1,6 @@
 fastapi==0.115.*
 uvicorn[standard]==0.30.*
+onnxruntime==1.19.*
+opencv-python-headless==4.10.*
+numpy==1.26.*
+python-multipart==0.0.*

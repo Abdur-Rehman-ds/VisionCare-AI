@@ -61,3 +61,16 @@ class PatientListOut(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+class ImageOut(BaseModel):
+    id: uuid.UUID
+    patient_id: uuid.UUID
+    original_filename: str
+    eye_side: str | None
+    quality_status: str
+    quality_reason: str | None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

@@ -216,3 +216,46 @@ export const GRADE_LABELS: Record<number, string> = {
   3: "Severe NPDR",
   4: "Proliferative DR",
 };
+
+/* ---------- reviews + report ---------- */
+
+export interface ReviewOut {
+  id: string;
+  analysis_id: string;
+  decision: string;
+  final_grade: number;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface ReportOut {
+  analysis_id: string;
+  patient_code: string;
+  patient_name: string;
+  eye_side: string | null;
+  ai_suggestion_label: string;
+  ai_grade: number | null;
+  ai_was_uncertain: boolean;
+  doctor_decision: string;
+  final_grade: number;
+  finding_text: string;
+  recommendation_text: string;
+  reviewed_at: string;
+  model_version: string | null;
+  disclaimer: string;
+}
+
+export function createReview(
+  analysisId: string,
+  body: { decision: string; final_grade: number; notes?: string },
+): Promise<ReviewOut> {
+  return apiFetch<ReviewOut>(`/api/v1/analyses/${analysisId}/review`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function getReport(analysisId: string): Promise<ReportOut> {
+  return apiFetch<ReportOut>(`/api/v1/analyses/${analysisId}/report`);
+}

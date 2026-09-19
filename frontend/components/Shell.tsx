@@ -14,7 +14,7 @@ export default function Shell({
   const router = useRouter();
   return (
     <div className="min-h-screen bg-slate-100">
-      <header className="border-b border-slate-300 bg-white shadow-sm">
+      <header className="border-b border-slate-300 bg-white shadow-sm print:hidden">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
           <div className="flex items-baseline gap-3">
             <span className="text-lg font-bold text-slate-900">

@@ -39,6 +39,7 @@ def request_analysis(image_id: uuid.UUID, background: BackgroundTasks,
                              AnalysisStatus.completed])))
     if existing:
         return existing  # idempotent: one authoritative analysis per image
+    # failed analyses do NOT block a retry — a new attempt starts fresh
 
     analysis = Analysis(clinic_id=user.clinic_id, image_id=img.id,
                         status=AnalysisStatus.queued)

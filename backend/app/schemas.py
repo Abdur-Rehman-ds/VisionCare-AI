@@ -95,3 +95,41 @@ class AnalysisOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ReviewIn(BaseModel):
+    decision: str = Field(pattern="^(agree|override)$")
+    final_grade: int = Field(ge=0, le=4)
+    notes: str | None = Field(default=None, max_length=2000)
+
+
+class ReviewOut(BaseModel):
+    id: uuid.UUID
+    analysis_id: uuid.UUID
+    decision: str
+    final_grade: int
+    notes: str | None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ReportOut(BaseModel):
+    """FR-5.3: recommendation text comes ONLY from the fixed reviewed
+    template table (Appendix C) keyed by the DOCTOR's final grade —
+    no free-text AI-generated recommendations exist anywhere."""
+    analysis_id: uuid.UUID
+    patient_code: str
+    patient_name: str
+    eye_side: str | None
+    ai_suggestion_label: str = "AI Screening Suggestion — Doctor Review Required"
+    ai_grade: int | None
+    ai_was_uncertain: bool
+    doctor_decision: str
+    final_grade: int
+    finding_text: str
+    recommendation_text: str
+    reviewed_at: datetime
+    model_version: str | None
+    disclaimer: str

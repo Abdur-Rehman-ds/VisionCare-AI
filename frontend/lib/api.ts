@@ -92,3 +92,59 @@ export async function login(email: string, password: string): Promise<void> {
 export function me(): Promise<UserOut> {
   return apiFetch<UserOut>("/api/v1/auth/me");
 }
+
+/* ---------- patients ---------- */
+
+export interface PatientOut {
+  id: string;
+  patient_code: string;
+  full_name: string;
+  date_of_birth: string | null;
+  gender: string | null;
+  is_archived: boolean;
+  created_at: string;
+}
+
+export interface PatientListOut {
+  data: PatientOut[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export function listPatients(params: {
+  search?: string;
+  page?: number;
+  include_archived?: boolean;
+}): Promise<PatientListOut> {
+  const q = new URLSearchParams();
+  if (params.search) q.set("search", params.search);
+  if (params.page) q.set("page", String(params.page));
+  if (params.include_archived) q.set("include_archived", "true");
+  return apiFetch<PatientListOut>(`/api/v1/patients?${q.toString()}`);
+}
+
+export function createPatient(body: {
+  patient_code: string;
+  full_name: string;
+  date_of_birth?: string | null;
+  gender?: string | null;
+}): Promise<PatientOut> {
+  return apiFetch<PatientOut>("/api/v1/patients", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function archivePatient(id: string): Promise<PatientOut> {
+  return apiFetch<PatientOut>(`/api/v1/patients/${id}/archive`, {
+    method: "POST",
+  });
+}
+
+export function unarchivePatient(id: string): Promise<PatientOut> {
+  return apiFetch<PatientOut>(`/api/v1/patients/${id}/unarchive`, {
+    method: "POST",
+  });
+}

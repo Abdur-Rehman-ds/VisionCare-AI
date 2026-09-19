@@ -1,0 +1,67 @@
+{
+  "experiment_id": "EXP-002-external",
+  "date": "2026-09-19",
+  "dataset": "Messidor-2 (ADCIS images, frozen sha256) + Google Brain adjudicated grades",
+  "n_evaluated": 1744,
+  "n_excluded_ungradable": 4,
+  "model": "exp2_fold0 (EyePACS-pretrain \u2192 APTOS fine-tune), preproc_v1, TTA hflip",
+  "protocol": "one-time external evaluation; no tuning against this set (\u00a714.1)",
+  "external_metrics": {
+    "qwk": 0.5661,
+    "referable_sensitivity": 0.311,
+    "referable_specificity": 0.989,
+    "referable_auc_threshold_free": 0.8438,
+    "per_class_recall": {
+      "0": 0.818,
+      "1": 0.219,
+      "2": 0.141,
+      "3": 0.213,
+      "4": 0.143
+    }
+  },
+  "class_distribution": {
+    "0": 1017,
+    "1": 270,
+    "2": 347,
+    "3": 75,
+    "4": 35
+  },
+  "confusion_matrix": [
+    [
+      832,
+      174,
+      9,
+      2,
+      0
+    ],
+    [
+      208,
+      59,
+      2,
+      1,
+      0
+    ],
+    [
+      118,
+      178,
+      49,
+      2,
+      0
+    ],
+    [
+      0,
+      16,
+      43,
+      16,
+      0
+    ],
+    [
+      0,
+      3,
+      13,
+      14,
+      5
+    ]
+  ],
+  "notes": "grade-3 n=75 / grade-4 n=35 \u2192 noisy per-class recall; systematic under-grading at APTOS-calibrated thresholds \u2014 ranking preserved (AUC 0.844), calibration shift, not discrimination failure; candidate fixes (EXP-003, M6): Ben Graham preproc, train-time color augmentation \u2014 validated internally only, never tuned on this set; acknowledgment + citations per Messidor-2 license required in publications"
+}

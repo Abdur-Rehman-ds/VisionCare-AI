@@ -2,26 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Clinical UI: fixed light theme, high contrast — no OS dark-mode
+   override. Dark mode, if ever wanted, becomes a deliberate M6 item. */
+html {
+  color-scheme: light;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  background: #f8fafc; /* slate-50 */
+  color: #0f172a;      /* slate-900 */
 }

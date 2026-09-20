@@ -268,3 +268,27 @@ export async function apiFetchBlob(path: string): Promise<Blob> {
   if (!res.ok) throw new ApiError(res.status, res.statusText);
   return res.blob();
 }
+/* ---------- dashboard ---------- */
+
+export interface DashboardHighRisk {
+  patient_id: string;
+  patient_code: string;
+  patient_name: string;
+  analysis_id: string;
+  grade: number;
+  grade_source: "ai" | "doctor";
+  created_at: string;
+}
+
+export interface DashboardOut {
+  total_patients: number;
+  scans_this_month: number;
+  high_risk_count: number;
+  pending_reviews: number;
+  agreement_rate: number | null;
+  high_risk_patients: DashboardHighRisk[];
+}
+
+export function getDashboard(): Promise<DashboardOut> {
+  return apiFetch<DashboardOut>("/api/v1/analytics/dashboard");
+}

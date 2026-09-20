@@ -133,3 +133,24 @@ class ReportOut(BaseModel):
     reviewed_at: datetime
     model_version: str | None
     disclaimer: str
+
+
+# ---------- Dashboard (FR-6) ----------
+
+class DashboardHighRiskOut(BaseModel):
+    patient_id: uuid.UUID
+    patient_code: str
+    patient_name: str
+    analysis_id: uuid.UUID
+    grade: int = Field(ge=3, le=4)
+    grade_source: str
+    created_at: datetime
+
+
+class DashboardOut(BaseModel):
+    total_patients: int
+    scans_this_month: int
+    high_risk_count: int
+    pending_reviews: int
+    agreement_rate: float | None
+    high_risk_patients: list[DashboardHighRiskOut]

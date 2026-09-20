@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { clearToken, UserOut } from "@/lib/api";
@@ -24,6 +25,20 @@ export default function Shell({
               Screening assistance — not a diagnostic device
             </span>
           </div>
+          <nav className="mt-3 flex gap-4">
+            <Link
+              href="/dashboard"
+              className="text-sm font-semibold text-slate-800 hover:text-slate-950"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/patients"
+              className="text-sm font-semibold text-slate-800 hover:text-slate-950"
+            >
+              Patients
+            </Link>
+          </nav>
           <div className="flex items-center gap-4">
             <span className="text-base font-medium text-slate-800">
               {user.full_name}

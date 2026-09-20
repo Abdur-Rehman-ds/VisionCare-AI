@@ -55,3 +55,62 @@ def test_demo_login_ok(client, monkeypatch):
     r = client.post("/api/v1/auth/demo-login")
     assert r.status_code == 200
     assert "access_token" in r.json()
+
+
+def test_signup_creates_clinic_admin_and_token(client):
+    payload = {
+        "clinic_name": "ClearView Eye Clinic",
+        "full_name": "Amina Khan",
+        "email": "owner@clearview.example.com",
+        "password": "SecurePass123",
+    }
+
+    r = client.post("/api/v1/auth/signup", json=payload)
+
+    assert r.status_code == 201, r.text
+    data = r.json()
+
+    assert data["clinic_name"] == "ClearView Eye Clinic"
+    assert data["user"]["email"] == "owner@clearview.example.com"
+    assert data["user"]["full_name"] == "Amina Khan"
+    assert data["user"]["role"] == "admin"
+    assert data["user"]["is_demo"] is False
+    assert data["access_token"]
+
+    me = client.get(
+        "/api/v1/auth/me",
+        headers={"Authorization": f"Bearer {data['access_token']}"},
+    )
+
+    assert me.status_code == 200, me.text
+    assert me.json()["email"] == "owner@clearview.example.com"
+    assert me.json()["role"] == "admin"
+
+
+def test_signup_rejects_duplicate_email(client, seeded):
+    r = client.post(
+        "/api/v1/auth/signup",
+        json={
+            "clinic_name": "Another Clinic",
+            "full_name": "Another Admin",
+            "email": "doc.a@example.com",
+            "password": "SecurePass123",
+        },
+    )
+
+    assert r.status_code == 409
+    assert r.json()["detail"] == "Email already registered"
+
+
+def test_signup_rejects_blank_trimmed_names(client):
+    r = client.post(
+        "/api/v1/auth/signup",
+        json={
+            "clinic_name": "   ",
+            "full_name": "   ",
+            "email": "blanknames@example.com",
+            "password": "SecurePass123",
+        },
+    )
+
+    assert r.status_code == 422

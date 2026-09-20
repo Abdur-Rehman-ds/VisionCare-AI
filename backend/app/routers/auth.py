@@ -2,13 +2,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.db import get_db
 from app.deps import get_current_user, require_role
 from app.models import AuditLog, Clinic, Role, User
-from app.schemas import RegisterIn, TokenOut, UserOut
+from app.schemas import ClinicSignupIn, ClinicSignupOut, RegisterIn, TokenOut, UserOut
 from app.security import create_access_token, hash_password, verify_password
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
@@ -41,6 +42,74 @@ def me(
         role=user.role.value,
         clinic_id=user.clinic_id,
         is_demo=bool(clinic and clinic.is_demo),
+    )
+
+
+@router.post("/signup", response_model=ClinicSignupOut, status_code=201)
+def signup(payload: ClinicSignupIn, db: Session = Depends(get_db)):
+    """Create a new clinic and its first administrator account."""
+    email = payload.email.lower().strip()
+    clinic_name = payload.clinic_name.strip()
+    full_name = payload.full_name.strip()
+
+    if len(clinic_name) < 2:
+        raise HTTPException(422, "Clinic name must contain at least 2 characters")
+    if len(full_name) < 2:
+        raise HTTPException(422, "Full name must contain at least 2 characters")
+
+    existing_user = db.scalar(select(User.id).where(User.email == email))
+    if existing_user:
+        raise HTTPException(409, "Email already registered")
+
+    try:
+        clinic = Clinic(name=clinic_name, is_demo=False)
+        db.add(clinic)
+        db.flush()
+
+        user = User(
+            clinic_id=clinic.id,
+            email=email,
+            hashed_password=hash_password(payload.password),
+            full_name=full_name,
+            role=Role.admin,
+            is_active=True,
+        )
+        db.add(user)
+        db.flush()
+
+        db.add(
+            AuditLog(
+                clinic_id=clinic.id,
+                user_id=user.id,
+                action="auth.signup",
+                entity_type="clinic",
+                meta={"clinic_name": clinic_name, "admin_email": email},
+            )
+        )
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(409, "Email already registered")
+
+    db.refresh(user)
+
+    token = create_access_token(
+        str(user.id),
+        str(clinic.id),
+        user.role.value,
+    )
+
+    return ClinicSignupOut(
+        access_token=token,
+        user=UserOut(
+            id=user.id,
+            email=user.email,
+            full_name=user.full_name,
+            role=user.role.value,
+            clinic_id=user.clinic_id,
+            is_demo=False,
+        ),
+        clinic_name=clinic.name,
     )
 
 

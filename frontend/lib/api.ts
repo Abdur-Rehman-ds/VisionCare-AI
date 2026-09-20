@@ -90,6 +90,45 @@ export async function login(email: string, password: string): Promise<void> {
   setToken(data.access_token);
 }
 
+export interface ClinicSignupInput {
+  clinic_name: string;
+  full_name: string;
+  email: string;
+  password: string;
+}
+
+export interface ClinicSignupOut {
+  access_token: string;
+  token_type: string;
+  user: UserOut;
+  clinic_name: string;
+}
+
+export async function signup(
+  payload: ClinicSignupInput,
+): Promise<ClinicSignupOut> {
+  const res = await fetch(`${API_BASE}/api/v1/auth/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    let detail = "Unable to create clinic account";
+    try {
+      const body = await res.json();
+      detail = typeof body.detail === "string" ? body.detail : detail;
+    } catch {
+      /* ignore */
+    }
+    throw new ApiError(res.status, detail);
+  }
+
+  const data = (await res.json()) as ClinicSignupOut;
+  setToken(data.access_token);
+  return data;
+}
+
 export function me(): Promise<UserOut> {
   return apiFetch<UserOut>("/api/v1/auth/me");
 }

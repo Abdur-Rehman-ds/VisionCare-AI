@@ -253,7 +253,19 @@ export default function LoginPage() {
                 )}
               </form>
 
-              <div className="mt-7 rounded-xl bg-slate-50 px-4 py-3">
+              <div className="mt-6 border-t border-slate-100 pt-6">
+                <p className="text-center text-sm text-slate-500">
+                  New clinic or hospital?{" "}
+                  <a
+                    href="/signup"
+                    className="font-semibold text-cyan-700 transition hover:text-cyan-900"
+                  >
+                    Create clinic workspace
+                  </a>
+                </p>
+              </div>
+
+              <div className="mt-5 rounded-xl bg-slate-50 px-4 py-3">
                 <p className="text-center text-xs leading-5 text-slate-500">
                   Secure AI-assisted screening • Doctor review required
                 </p>

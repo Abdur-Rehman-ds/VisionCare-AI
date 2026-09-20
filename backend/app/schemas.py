@@ -31,6 +31,20 @@ class RegisterIn(BaseModel):
     role: str = "doctor"
 
 
+class ClinicSignupIn(BaseModel):
+    clinic_name: str = Field(min_length=2, max_length=200)
+    full_name: str = Field(min_length=2, max_length=200)
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
+
+
+class ClinicSignupOut(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserOut
+    clinic_name: str
+
+
 class PatientIn(BaseModel):
     patient_code: str = Field(min_length=1, max_length=64)
     full_name: str = Field(min_length=1, max_length=200)

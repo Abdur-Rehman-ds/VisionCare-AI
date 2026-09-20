@@ -22,6 +22,7 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       MODEL_SERVICE_URL: http://model:8001
       JWT_SECRET: ${JWT_SECRET}
+      DEMO_MODE: ${DEMO_MODE}
     volumes: [uploads_data:/data/uploads]
     depends_on:
       db: { condition: service_healthy }
@@ -29,9 +30,14 @@ services:
     ports: ["8000:8000"]
 
   frontend:
-    build: ../frontend
+    build:
+      context: ../frontend
+      args:
+        NEXT_PUBLIC_API_BASE: ${NEXT_PUBLIC_API_BASE:-http://localhost:8000}
+        NEXT_PUBLIC_DEMO_MODE: ${NEXT_PUBLIC_DEMO_MODE:-false}
     environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:8000/api/v1"
+      NEXT_PUBLIC_API_BASE: ${NEXT_PUBLIC_API_BASE:-http://localhost:8000}
+      NEXT_PUBLIC_DEMO_MODE: ${NEXT_PUBLIC_DEMO_MODE:-false}
     depends_on: [api]
     ports: ["3000:3000"]
 

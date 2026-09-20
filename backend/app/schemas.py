@@ -18,6 +18,7 @@ class UserOut(BaseModel):
     full_name: str
     role: str
     clinic_id: uuid.UUID
+    is_demo: bool = False
 
     class Config:
         from_attributes = True

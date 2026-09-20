@@ -67,6 +67,7 @@ export interface UserOut {
   full_name: string;
   role: string;
   clinic_id: string;
+  is_demo: boolean;
 }
 
 export async function login(email: string, password: string): Promise<void> {
@@ -291,4 +292,23 @@ export interface DashboardOut {
 
 export function getDashboard(): Promise<DashboardOut> {
   return apiFetch<DashboardOut>("/api/v1/analytics/dashboard");
+}
+
+export async function demoLogin(): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/v1/auth/demo-login`, {
+    method: "POST",
+  });
+
+  if (!res.ok) {
+    let detail = "Demo login failed";
+    try {
+      detail = (await res.json()).detail ?? detail;
+    } catch {
+      /* ignore */
+    }
+    throw new ApiError(res.status, detail);
+  }
+
+  const data = (await res.json()) as { access_token: string };
+  setToken(data.access_token);
 }

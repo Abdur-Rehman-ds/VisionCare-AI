@@ -54,8 +54,12 @@ def dashboard(
     )
 
     scans_this_month = db.scalar(
-        select(func.count(Image.id)).where(
+        select(func.count(Image.id))
+        .select_from(Image)
+        .join(Patient, Patient.id == Image.patient_id)
+        .where(
             Image.clinic_id == user.clinic_id,
+            Patient.is_archived.is_(False),
             Image.created_at >= month_start,
         )
     ) or 0
@@ -95,9 +99,12 @@ def dashboard(
     pending_reviews = db.scalar(
         select(func.count(Analysis.id))
         .select_from(Analysis)
+        .join(Image, Image.id == Analysis.image_id)
+        .join(Patient, Patient.id == Image.patient_id)
         .outerjoin(Review, Review.analysis_id == Analysis.id)
         .where(
             Analysis.clinic_id == user.clinic_id,
+            Patient.is_archived.is_(False),
             Analysis.status == AnalysisStatus.completed,
             Review.id.is_(None),
         )
@@ -115,7 +122,15 @@ def dashboard(
                     else_=0,
                 )
             ),
-        ).where(Review.clinic_id == user.clinic_id)
+        )
+        .select_from(Review)
+        .join(Analysis, Analysis.id == Review.analysis_id)
+        .join(Image, Image.id == Analysis.image_id)
+        .join(Patient, Patient.id == Image.patient_id)
+        .where(
+            Review.clinic_id == user.clinic_id,
+            Patient.is_archived.is_(False),
+        )
     ).one()
 
     total_reviews = int(review_stats[0] or 0)

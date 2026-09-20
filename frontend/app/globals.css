@@ -12,3 +12,154 @@ body {
   background: #f8fafc; /* slate-50 */
   color: #0f172a;      /* slate-900 */
 }
+
+
+/* VisionCare A4 report print layout */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .report-print-page {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  .report-document {
+    width: 100% !important;
+    max-width: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  /*
+   * Do not depend on "Background graphics" being enabled.
+   * The screen keeps its premium dark header, while print gets
+   * a clean clinical white/navy document header.
+   */
+  .report-hero {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border-bottom: 2px solid #0f172a !important;
+    padding: 4mm 5mm !important;
+  }
+
+  .report-hero * {
+    color: #0f172a !important;
+    text-shadow: none !important;
+  }
+
+  .report-hero > div:first-child,
+  .report-hero > div:nth-child(2) {
+    display: none !important;
+  }
+
+  .report-hero h1 {
+    font-size: 21px !important;
+    line-height: 1.15 !important;
+  }
+
+  .report-hero p {
+    line-height: 1.35 !important;
+  }
+
+  .report-body {
+    padding: 4mm 5mm 3mm !important;
+  }
+
+  .report-body > * + * {
+    margin-top: 3mm !important;
+  }
+
+  .report-patient-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 2mm !important;
+  }
+
+  .report-patient-grid > div {
+    padding: 3mm !important;
+    border-radius: 2mm !important;
+  }
+
+  .report-final {
+    border-radius: 2mm !important;
+    break-inside: avoid !important;
+  }
+
+  .report-final > div {
+    padding: 3.5mm 4mm !important;
+  }
+
+  .report-final p.text-3xl {
+    font-size: 22px !important;
+  }
+
+  .report-dual-grid,
+  .report-clinical-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 2mm !important;
+  }
+
+  .report-dual-grid > div,
+  .report-clinical-grid > div {
+    padding: 3mm !important;
+    border-radius: 2mm !important;
+    break-inside: avoid !important;
+  }
+
+  .report-clinical-grid p {
+    line-height: 1.45 !important;
+  }
+
+  .report-meta {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1.5mm !important;
+    padding: 2.5mm !important;
+    border-radius: 2mm !important;
+    break-inside: avoid !important;
+  }
+
+  .report-meta > div {
+    padding: 1.5mm 2mm !important;
+  }
+
+  .report-disclaimer {
+    padding: 3mm !important;
+    border-radius: 2mm !important;
+    break-inside: avoid !important;
+  }
+
+  .report-disclaimer p {
+    line-height: 1.4 !important;
+  }
+
+  .report-footer {
+    padding-top: 2mm !important;
+    gap: 2mm !important;
+    font-size: 8px !important;
+    break-inside: avoid !important;
+  }
+
+  .report-body section,
+  .report-body footer {
+    break-inside: avoid !important;
+  }
+}

@@ -56,6 +56,11 @@ export async function apiFetch<T>(
     }
     throw new ApiError(res.status, detail);
   }
+
+  if (res.status === 204) {
+    return undefined as T;
+  }
+
   return res.json() as Promise<T>;
 }
 
@@ -131,6 +136,62 @@ export async function signup(
 
 export function me(): Promise<UserOut> {
   return apiFetch<UserOut>("/api/v1/auth/me");
+}
+
+/* ---------- team & access ---------- */
+
+export type TeamRole = "admin" | "doctor" | "staff";
+
+export interface TeamMemberOut {
+  id: string;
+  email: string;
+  full_name: string;
+  role: TeamRole;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface CreateTeamMemberInput {
+  email: string;
+  password: string;
+  full_name: string;
+  role: TeamRole;
+}
+
+export function listTeam(): Promise<TeamMemberOut[]> {
+  return apiFetch<TeamMemberOut[]>("/api/v1/team");
+}
+
+export function createTeamMember(
+  payload: CreateTeamMemberInput,
+): Promise<TeamMemberOut> {
+  return apiFetch<TeamMemberOut>("/api/v1/team", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateTeamMemberStatus(
+  memberId: string,
+  isActive: boolean,
+): Promise<TeamMemberOut> {
+  return apiFetch<TeamMemberOut>(`/api/v1/team/${memberId}/status`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ is_active: isActive }),
+  });
+}
+
+export function updateTeamMemberRole(
+  memberId: string,
+  role: TeamRole,
+): Promise<TeamMemberOut> {
+  return apiFetch<TeamMemberOut>(`/api/v1/team/${memberId}/role`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ role }),
+  });
 }
 
 /* ---------- patients ---------- */
@@ -223,6 +284,12 @@ export function uploadImage(
   });
 }
 
+export function deleteBlurryImage(imageId: string): Promise<void> {
+  return apiFetch<void>(`/api/v1/images/${imageId}`, {
+    method: "DELETE",
+  });
+}
+
 /* ---------- analyses ---------- */
 
 export interface AnalysisOut {
@@ -281,6 +348,9 @@ export interface ReportOut {
   finding_text: string;
   recommendation_text: string;
   reviewed_at: string;
+  reviewer_name: string | null;
+  reviewer_role: string | null;
+  review_notes: string | null;
   model_version: string | null;
   disclaimer: string;
 }

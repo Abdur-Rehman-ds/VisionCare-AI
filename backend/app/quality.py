@@ -12,6 +12,7 @@ MIN_SIDE = 300          # too small to grade
 BLUR_THRESHOLD = 40.0   # variance of Laplacian below this = blurry
 DARK_THRESHOLD = 25.0   # mean intensity below this = mostly black
 BRIGHT_THRESHOLD = 235.0
+BLUR_REASON_MESSAGE = "Image appears too blurred for assessment"
 
 
 def check_quality(image_bytes: bytes) -> tuple[bool, str | None, str | None]:
@@ -31,5 +32,5 @@ def check_quality(image_bytes: bytes) -> tuple[bool, str | None, str | None]:
         return False, "overexposed", "Image is overexposed"
     blur = float(cv2.Laplacian(gray, cv2.CV_64F).var())
     if blur < BLUR_THRESHOLD:
-        return False, "blurry", "Image appears too blurred for assessment"
+        return False, "blurry", BLUR_REASON_MESSAGE
     return True, None, None

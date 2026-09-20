@@ -31,6 +31,26 @@ class RegisterIn(BaseModel):
     role: str = "doctor"
 
 
+class TeamMemberOut(BaseModel):
+    id: uuid.UUID
+    email: EmailStr
+    full_name: str
+    role: str
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class TeamMemberStatusIn(BaseModel):
+    is_active: bool
+
+
+class TeamMemberRoleIn(BaseModel):
+    role: str
+
+
 class ClinicSignupIn(BaseModel):
     clinic_name: str = Field(min_length=2, max_length=200)
     full_name: str = Field(min_length=2, max_length=200)
@@ -146,6 +166,9 @@ class ReportOut(BaseModel):
     finding_text: str
     recommendation_text: str
     reviewed_at: datetime
+    reviewer_name: str | None = None
+    reviewer_role: str | None = None
+    review_notes: str | None = None
     model_version: str | None
     disclaimer: str
 

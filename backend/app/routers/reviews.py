@@ -74,6 +74,7 @@ def get_report(analysis_id: uuid.UUID, db: Session = Depends(get_db),
         raise HTTPException(409, "Report unavailable: doctor review required")
     image: Image = db.get(Image, a.image_id)
     patient: Patient = db.get(Patient, image.patient_id)
+    reviewer: User | None = db.get(User, a.review.reviewed_by)
     fg = a.review.final_grade
     db.add(AuditLog(clinic_id=user.clinic_id, user_id=user.id,
                     action="report.generated", entity_type="analysis",
@@ -86,5 +87,9 @@ def get_report(analysis_id: uuid.UUID, db: Session = Depends(get_db),
         doctor_decision=a.review.decision.value, final_grade=fg,
         finding_text=GRADE_FINDINGS[fg],
         recommendation_text=GRADE_RECOMMENDATIONS[fg],
-        reviewed_at=a.review.created_at, model_version=a.model_version,
+        reviewed_at=a.review.created_at,
+        reviewer_name=reviewer.full_name if reviewer else None,
+        reviewer_role=reviewer.role.value if reviewer else None,
+        review_notes=a.review.notes,
+        model_version=a.model_version,
         disclaimer=DISCLAIMER)

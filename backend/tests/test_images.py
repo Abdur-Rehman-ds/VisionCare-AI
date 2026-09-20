@@ -66,3 +66,46 @@ def test_cross_clinic_upload_404(client, auth_a, auth_b):
     pid = _mk_patient(client, auth_a, "P-IMG5")
     r = _upload(client, auth_b, pid, _png_bytes())
     assert r.status_code == 404
+
+
+def test_delete_blurry_image_allowed(client, auth_a):
+    pid = _mk_patient(client, auth_a, "P-IMG6")
+    uploaded = _upload(client, auth_a, pid, _png_bytes(blur=True))
+    assert uploaded.status_code == 201
+    body = uploaded.json()
+    assert body["quality_status"] == "failed"
+    assert body["quality_reason"] == "Image appears too blurred for assessment"
+
+    r = client.delete(f"/api/v1/images/{body['id']}", headers=auth_a)
+    assert r.status_code == 204, r.text
+
+    listed = client.get(
+        f"/api/v1/patients/{pid}/images",
+        headers=auth_a,
+    )
+    assert listed.status_code == 200
+    assert listed.json() == []
+
+
+def test_delete_passed_image_rejected(client, auth_a):
+    pid = _mk_patient(client, auth_a, "P-IMG7")
+    uploaded = _upload(client, auth_a, pid, _png_bytes())
+    assert uploaded.status_code == 201
+    body = uploaded.json()
+    assert body["quality_status"] == "passed"
+
+    r = client.delete(f"/api/v1/images/{body['id']}", headers=auth_a)
+    assert r.status_code == 409
+    assert "Only images rejected specifically for blur" in r.text
+
+
+def test_delete_blurry_image_cross_clinic_404(client, auth_a, auth_b):
+    pid = _mk_patient(client, auth_a, "P-IMG8")
+    uploaded = _upload(client, auth_a, pid, _png_bytes(blur=True))
+    assert uploaded.status_code == 201
+
+    r = client.delete(
+        f"/api/v1/images/{uploaded.json()['id']}",
+        headers=auth_b,
+    )
+    assert r.status_code == 404

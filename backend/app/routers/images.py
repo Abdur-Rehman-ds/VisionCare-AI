@@ -17,8 +17,8 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.db import get_db
 from app.deps import get_current_user
-from app.models import AuditLog, Image, Patient, QualityStatus, User
-from app.quality import check_quality
+from app.models import Analysis, AuditLog, Image, Patient, QualityStatus, User
+from app.quality import BLUR_REASON_MESSAGE, check_quality
 from app.routers.patients import _get_scoped
 from app.schemas import ImageOut
 
@@ -79,6 +79,62 @@ async def upload_image(patient_id: uuid.UUID,
     db.commit()
     db.refresh(img)
     return img
+
+
+@router.delete("/images/{image_id}", status_code=204)
+def delete_blurry_image(image_id: uuid.UUID,
+                        db: Session = Depends(get_db),
+                        user: User = Depends(get_current_user)):
+    img = db.scalar(
+        select(Image).where(
+            Image.id == image_id,
+            Image.clinic_id == user.clinic_id,
+        )
+    )
+    if img is None:
+        raise HTTPException(404, "Image not found")
+
+    if (
+        img.quality_status != QualityStatus.failed
+        or img.quality_reason != BLUR_REASON_MESSAGE
+    ):
+        raise HTTPException(
+            409,
+            "Only images rejected specifically for blur can be removed",
+        )
+
+    existing_analysis = db.scalar(
+        select(Analysis).where(Analysis.image_id == img.id)
+    )
+    if existing_analysis is not None:
+        raise HTTPException(
+            409,
+            "Image cannot be removed because an analysis exists",
+        )
+
+    file_path = Path(img.file_path)
+
+    db.add(
+        AuditLog(
+            clinic_id=user.clinic_id,
+            user_id=user.id,
+            action="image.delete_blurry",
+            entity_type="image",
+            entity_id=str(img.id),
+            meta={
+                "patient_id": str(img.patient_id),
+                "filename": img.original_filename,
+            },
+        )
+    )
+    db.delete(img)
+    db.commit()
+
+    try:
+        file_path.unlink(missing_ok=True)
+    except OSError:
+        # Database removal already succeeded; stale file cleanup is non-critical.
+        pass
 
 
 @router.get("/patients/{patient_id}/images", response_model=list[ImageOut])

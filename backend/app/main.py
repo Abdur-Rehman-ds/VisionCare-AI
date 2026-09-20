@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import analyses, analytics, auth, images, patients, reviews
+from app.routers import analyses, analytics, auth, images, patients, reviews, team
 
 app = FastAPI(title="VisionCare AI API", version="0.1.0")
 app.add_middleware(CORSMiddleware,
@@ -14,6 +14,7 @@ app.include_router(images.router)
 app.include_router(analyses.router)
 app.include_router(reviews.router)
 app.include_router(analytics.router)
+app.include_router(team.router)
 
 
 @app.get("/health")

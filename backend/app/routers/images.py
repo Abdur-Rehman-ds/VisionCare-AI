@@ -14,6 +14,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.db import get_db
 from app.deps import get_current_user
 from app.models import AuditLog, Image, Patient, QualityStatus, User
@@ -23,7 +24,7 @@ from app.schemas import ImageOut
 
 router = APIRouter(prefix="/api/v1", tags=["images"])
 
-UPLOAD_ROOT = Path("/data/uploads")
+UPLOAD_ROOT = Path(settings.upload_root)
 MAX_BYTES = 10 * 1024 * 1024
 ALLOWED = {"image/jpeg": ".jpg", "image/png": ".png"}
 EYE_SIDES = {"left", "right", "unknown"}

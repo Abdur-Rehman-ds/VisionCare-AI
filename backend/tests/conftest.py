@@ -7,6 +7,10 @@ os.environ["DATABASE_URL"] = os.environ.get(
     "TEST_DATABASE_URL",
     "postgresql+psycopg://vc:localdev@db:5432/visioncare_test")
 
+os.environ["UPLOAD_ROOT"] = os.environ.get(
+    "TEST_UPLOAD_ROOT",
+    "/tmp/visioncare-test-uploads")
+
 import pytest
 from fastapi.testclient import TestClient
 

@@ -17,6 +17,7 @@ from pathlib import Path
 
 from sqlalchemy import select
 
+from app.config import settings
 from app.db import SessionLocal
 from app.models import (
     Analysis,
@@ -36,7 +37,7 @@ ADMIN_EMAIL = "admin@visioncare-demo.example.com"
 ADMIN_PASSWORD = "admin12345"
 
 ASSET_ROOT = Path("/app/demo-assets/rfmid")
-UPLOAD_ROOT = Path("/data/uploads")
+UPLOAD_ROOT = Path(settings.upload_root)
 
 DEMO_CASES = [
     ("VC-DEMO-001", "Ayesha Rahman", "1981-03-14", "female", 1, 3.133218, 3, False),

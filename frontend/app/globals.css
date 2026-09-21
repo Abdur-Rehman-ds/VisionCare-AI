@@ -52,13 +52,16 @@ body {
     left: 50% !important;
     top: 48% !important;
     transform: translate(-50%, -50%) rotate(-28deg) !important;
-    z-index: 9999 !important;
-    font-size: 34px !important;
+    z-index: 99999 !important;
+    font-size: 38px !important;
     font-weight: 900 !important;
-    letter-spacing: 0.18em !important;
-    color: rgba(8, 145, 178, 0.12) !important;
+    letter-spacing: 0.16em !important;
+    color: #0891b2 !important;
+    opacity: 0.22 !important;
     white-space: nowrap !important;
     pointer-events: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /*

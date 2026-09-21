@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     demo_mode: bool = False
     demo_reset_secret: str = ""
     demo_analysis_daily_limit: int = 20
+    cors_origins: str = "http://localhost:3000"
     upload_root: str = "/data/uploads"
 
 

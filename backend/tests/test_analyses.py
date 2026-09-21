@@ -105,3 +105,59 @@ def test_worker_uncertain_stores_no_grade(client, auth_a, monkeypatch):
     assert got["status"] == "completed"
     assert got["is_uncertain"] is True
     assert got["predicted_grade"] is None  # FR-4.4: no grade displayed
+
+
+def test_demo_analysis_daily_limit(client, monkeypatch):
+    from app.config import settings
+    from app.db import SessionLocal
+    from app.models import Clinic, Role, User
+    from app.security import hash_password
+    import app.routers.analyses as mod
+
+    db = SessionLocal()
+    clinic = Clinic(name="Demo Limit Clinic", is_demo=True)
+    db.add(clinic)
+    db.flush()
+
+    user = User(
+        clinic_id=clinic.id,
+        email="demo-limit@example.com",
+        hashed_password=hash_password("password123"),
+        full_name="Demo Limit User",
+        role=Role.doctor,
+    )
+    db.add(user)
+    db.commit()
+    db.close()
+
+    login = client.post(
+        "/api/v1/auth/login",
+        data={
+            "username": "demo-limit@example.com",
+            "password": "password123",
+        },
+    )
+    assert login.status_code == 200
+
+    headers = {
+        "Authorization": f"Bearer {login.json()['access_token']}"
+    }
+
+    monkeypatch.setattr(settings, "demo_analysis_daily_limit", 1)
+    monkeypatch.setattr(mod, "run_analysis", lambda _id: None)
+
+    first_image = _setup_image(client, headers, "DEMO-LIMIT-1")
+    first = client.post(
+        f"/api/v1/images/{first_image}/analyze",
+        headers=headers,
+    )
+    assert first.status_code == 202
+
+    second_image = _setup_image(client, headers, "DEMO-LIMIT-2")
+    blocked = client.post(
+        f"/api/v1/images/{second_image}/analyze",
+        headers=headers,
+    )
+
+    assert blocked.status_code == 429
+    assert "daily analysis limit" in blocked.json()["detail"].lower()

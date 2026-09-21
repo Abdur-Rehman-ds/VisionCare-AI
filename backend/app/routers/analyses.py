@@ -2,17 +2,19 @@
 row; frontend polls GET until completed/failed. Quality-failed images
 are refused analysis (FR-3.2: rejected scans never reach the model)."""
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import FileResponse
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.analysis_worker import run_analysis
+from app.config import settings
 from app.db import get_db
 from app.deps import get_current_user
-from app.models import (Analysis, AnalysisStatus, AuditLog, Image,
+from app.models import (Analysis, AnalysisStatus, AuditLog, Clinic, Image,
                         QualityStatus, User)
 from app.schemas import AnalysisOut
 
@@ -42,6 +44,27 @@ def request_analysis(image_id: uuid.UUID, background: BackgroundTasks,
     if existing:
         return existing  # idempotent: one authoritative analysis per image
     # failed analyses do NOT block a retry — a new attempt starts fresh
+
+    clinic = db.get(Clinic, user.clinic_id)
+    if clinic is not None and clinic.is_demo:
+        now = datetime.now(timezone.utc)
+        day_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        analyses_today = db.scalar(
+            select(func.count())
+            .select_from(AuditLog)
+            .where(
+                AuditLog.clinic_id == user.clinic_id,
+                AuditLog.action == "analysis.requested",
+                AuditLog.created_at >= day_start,
+            )
+        ) or 0
+
+        if analyses_today >= settings.demo_analysis_daily_limit:
+            raise HTTPException(
+                429,
+                "Demo daily analysis limit reached; please try again tomorrow",
+            )
 
     analysis = Analysis(clinic_id=user.clinic_id, image_id=img.id,
                         status=AnalysisStatus.queued)

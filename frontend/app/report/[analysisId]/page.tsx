@@ -18,14 +18,14 @@ export default function ReportPage() {
     <AuthGuard>
       {(user) => (
         <Shell user={user}>
-          <ReportView />
+          <ReportView isDemo={user.is_demo} />
         </Shell>
       )}
     </AuthGuard>
   );
 }
 
-function ReportView() {
+function ReportView({ isDemo }: { isDemo: boolean }) {
   const params = useParams<{ analysisId: string }>();
   const [report, setReport] = useState<ReportOut | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +102,16 @@ function ReportView() {
         </button>
       </div>
 
-      <article className="report-document overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 print:rounded-none print:border-0 print:shadow-none">
+      <article className="report-document relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 print:rounded-none print:border-0 print:shadow-none">
+        {isDemo && (
+          <div
+            className="report-demo-watermark pointer-events-none absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2 -rotate-[28deg] whitespace-nowrap text-4xl font-black uppercase tracking-[0.18em] text-cyan-700/10"
+            aria-hidden="true"
+          >
+            DEMO — FICTIONAL DATA
+          </div>
+        )}
+
         <header className="report-hero relative overflow-hidden bg-slate-950 px-7 py-8 text-white sm:px-10">
           <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-cyan-400/10 blur-3xl" />
           <div className="absolute right-28 top-20 h-32 w-32 rounded-full bg-blue-400/10 blur-3xl" />

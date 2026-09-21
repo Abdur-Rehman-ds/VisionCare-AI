@@ -23,6 +23,8 @@ services:
       MODEL_SERVICE_URL: http://model:8001
       JWT_SECRET: ${JWT_SECRET}
       DEMO_MODE: ${DEMO_MODE}
+      DEMO_RESET_SECRET: ${DEMO_RESET_SECRET:-}
+      DEMO_ANALYSIS_DAILY_LIMIT: ${DEMO_ANALYSIS_DAILY_LIMIT:-20}
     volumes: [uploads_data:/data/uploads]
     depends_on:
       db: { condition: service_healthy }

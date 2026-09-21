@@ -1,0 +1,38 @@
+name: Demo Nightly Reset
+
+on:
+  schedule:
+    - cron: "30 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reset-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Reset VisionCare demo clinic
+        env:
+          DEMO_RESET_URL: ${{ secrets.DEMO_RESET_URL }}
+          DEMO_RESET_SECRET: ${{ secrets.DEMO_RESET_SECRET }}
+        run: |
+          if [ -z "$DEMO_RESET_URL" ] || [ -z "$DEMO_RESET_SECRET" ]; then
+            echo "Required demo reset secrets are not configured."
+            exit 1
+          fi
+
+          curl --fail-with-body \
+            --silent \
+            --show-error \
+            --retry 3 \
+            --retry-delay 10 \
+            --max-time 120 \
+            -X POST \
+            -H "X-Demo-Reset-Secret: $DEMO_RESET_SECRET" \
+            "$DEMO_RESET_URL"
+
+          echo
+          echo "Demo reset completed successfully."

@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     jwt_secret: str = "change-me"
     model_service_url: str = "http://model:8001"
     demo_mode: bool = False
+    demo_reset_secret: str = ""
+    demo_analysis_daily_limit: int = 20
     upload_root: str = "/data/uploads"
 
 
